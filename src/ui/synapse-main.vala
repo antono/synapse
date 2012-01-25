@@ -175,6 +175,7 @@ namespace Synapse
         typeof (CalculatorPlugin),
         typeof (SelectionPlugin),
         typeof (SshPlugin),
+        typeof (HudPlugin),
         // typeof (FileOpPlugin),
         // typeof (PidginPlugin),
         // typeof (ChatActions),
