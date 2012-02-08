@@ -154,48 +154,48 @@ namespace Synapse.Gui
     
     public void update_bindings ()
     {
-      kcs.clear ();
-      uint keyval;
-      Gdk.ModifierType mods;
+      // kcs.clear ();
+      // uint keyval;
+      // Gdk.ModifierType mods;
 
-      name_to_key_mod (activate, out keyval, out mods);
-      kcs.set_keycombo_command (keyval, mods, Commands.ACTIVATE);
-      name_to_key_mod (execute, out keyval, out mods);
-      kcs.set_keycombo_command (keyval, mods, Commands.EXECUTE);
-      name_to_key_mod (execute_without_hide, out keyval, out mods);
-      kcs.set_keycombo_command (keyval, mods, Commands.EXECUTE_WITHOUT_HIDE);
-      name_to_key_mod (delete_char, out keyval, out mods);
-      kcs.set_keycombo_command (keyval, mods, Commands.SEARCH_DELETE_CHAR);
-      name_to_key_mod (alternative_delete_char, out keyval, out mods);
-      kcs.set_keycombo_command (keyval, mods, Commands.SEARCH_DELETE_CHAR);
-      name_to_key_mod (next_match, out keyval, out mods);
-      kcs.set_keycombo_command (keyval, mods, Commands.NEXT_RESULT);
-      name_to_key_mod (prev_match, out keyval, out mods);
-      kcs.set_keycombo_command (keyval, mods, Commands.PREV_RESULT);
-      name_to_key_mod (first_match, out keyval, out mods);
-      kcs.set_keycombo_command (keyval, mods, Commands.FIRST_RESULT);
-      name_to_key_mod (last_match, out keyval, out mods);
-      kcs.set_keycombo_command (keyval, mods, Commands.LAST_RESULT);
-      name_to_key_mod (next_match_page, out keyval, out mods);
-      kcs.set_keycombo_command (keyval, mods, Commands.NEXT_PAGE);
-      name_to_key_mod (prev_match_page, out keyval, out mods);
-      kcs.set_keycombo_command (keyval, mods, Commands.PREV_PAGE);
-      name_to_key_mod (next_category, out keyval, out mods);
-      kcs.set_keycombo_command (keyval, mods, Commands.NEXT_CATEGORY);
-      name_to_key_mod (prev_category, out keyval, out mods);
-      kcs.set_keycombo_command (keyval, mods, Commands.PREV_CATEGORY);
-      name_to_key_mod (next_search_type, out keyval, out mods);
-      kcs.set_keycombo_command (keyval, mods, Commands.NEXT_PANE);
-      name_to_key_mod (prev_search_type, out keyval, out mods);
-      kcs.set_keycombo_command (keyval, mods, Commands.PREV_PANE);
-      name_to_key_mod (cancel, out keyval, out mods);
-      kcs.set_keycombo_command (keyval, mods, Commands.CLEAR_SEARCH_OR_HIDE);
-      name_to_key_mod (paste, out keyval, out mods);
-      kcs.set_keycombo_command (keyval, mods, Commands.PASTE);
-      name_to_key_mod (alt_paste, out keyval, out mods);
-      kcs.set_keycombo_command (keyval, mods, Commands.PASTE_SELECTION);
-      name_to_key_mod (exit, out keyval, out mods);
-      kcs.set_keycombo_command (keyval, mods, Commands.EXIT_SYNAPSE);
+      // name_to_key_mod (activate, out keyval, out mods);
+      // kcs.set_keycombo_command (keyval, mods, Commands.ACTIVATE);
+      // name_to_key_mod (execute, out keyval, out mods);
+      // kcs.set_keycombo_command (keyval, mods, Commands.EXECUTE);
+      // name_to_key_mod (execute_without_hide, out keyval, out mods);
+      // kcs.set_keycombo_command (keyval, mods, Commands.EXECUTE_WITHOUT_HIDE);
+      // name_to_key_mod (delete_char, out keyval, out mods);
+      // kcs.set_keycombo_command (keyval, mods, Commands.SEARCH_DELETE_CHAR);
+      // name_to_key_mod (alternative_delete_char, out keyval, out mods);
+      // kcs.set_keycombo_command (keyval, mods, Commands.SEARCH_DELETE_CHAR);
+      // name_to_key_mod (next_match, out keyval, out mods);
+      // kcs.set_keycombo_command (keyval, mods, Commands.NEXT_RESULT);
+      // name_to_key_mod (prev_match, out keyval, out mods);
+      // kcs.set_keycombo_command (keyval, mods, Commands.PREV_RESULT);
+      // name_to_key_mod (first_match, out keyval, out mods);
+      // kcs.set_keycombo_command (keyval, mods, Commands.FIRST_RESULT);
+      // name_to_key_mod (last_match, out keyval, out mods);
+      // kcs.set_keycombo_command (keyval, mods, Commands.LAST_RESULT);
+      // name_to_key_mod (next_match_page, out keyval, out mods);
+      // kcs.set_keycombo_command (keyval, mods, Commands.NEXT_PAGE);
+      // name_to_key_mod (prev_match_page, out keyval, out mods);
+      // kcs.set_keycombo_command (keyval, mods, Commands.PREV_PAGE);
+      // name_to_key_mod (next_category, out keyval, out mods);
+      // kcs.set_keycombo_command (keyval, mods, Commands.NEXT_CATEGORY);
+      // name_to_key_mod (prev_category, out keyval, out mods);
+      // kcs.set_keycombo_command (keyval, mods, Commands.PREV_CATEGORY);
+      // name_to_key_mod (next_search_type, out keyval, out mods);
+      // kcs.set_keycombo_command (keyval, mods, Commands.NEXT_PANE);
+      // name_to_key_mod (prev_search_type, out keyval, out mods);
+      // kcs.set_keycombo_command (keyval, mods, Commands.PREV_PANE);
+      // name_to_key_mod (cancel, out keyval, out mods);
+      // kcs.set_keycombo_command (keyval, mods, Commands.CLEAR_SEARCH_OR_HIDE);
+      // name_to_key_mod (paste, out keyval, out mods);
+      // kcs.set_keycombo_command (keyval, mods, Commands.PASTE);
+      // name_to_key_mod (alt_paste, out keyval, out mods);
+      // kcs.set_keycombo_command (keyval, mods, Commands.PASTE_SELECTION);
+      // name_to_key_mod (exit, out keyval, out mods);
+      // kcs.set_keycombo_command (keyval, mods, Commands.EXIT_SYNAPSE);
     }
     
     
@@ -205,9 +205,9 @@ namespace Synapse.Gui
     public Commands get_command_from_eventkey (Gdk.EventKey event)
     {
       uint keyval = event.keyval;
-      if (keyval == Gdk.KeySyms.KP_Enter || keyval == Gdk.KeySyms.ISO_Enter)
+      if (keyval == Gdk.Key.KP_Enter || keyval == Gdk.Key.ISO_Enter)
       {
-        keyval = Gdk.KeySyms.Return;
+        keyval = Gdk.Key.Return;
       }
       Gdk.ModifierType mod = event.state & mod_normalize_mask;
       // Synapse.Utils.Logger.log (this, get_name_from_key (keyval, mod));
@@ -217,9 +217,9 @@ namespace Synapse.Gui
     public static string? get_name_from_key (uint keyval, Gdk.ModifierType mods)
     {
       mods = mods & mod_normalize_mask;
-      if (keyval == Gdk.KeySyms.KP_Enter || keyval == Gdk.KeySyms.ISO_Enter)
+      if (keyval == Gdk.Key.KP_Enter || keyval == Gdk.Key.ISO_Enter)
       {
-        keyval = Gdk.KeySyms.Return;
+        keyval = Gdk.Key.Return;
       }
       unowned string keyname = Gdk.keyval_name (Gdk.keyval_to_lower (keyval));
       if (keyname == null) return null;
@@ -288,9 +288,9 @@ namespace Synapse.Gui
           }
         }
       }
-      if (keyval == Gdk.KeySyms.KP_Enter || keyval == Gdk.KeySyms.ISO_Enter)
+      if (keyval == Gdk.Key.KP_Enter || keyval == Gdk.Key.ISO_Enter)
       {
-        keyval = Gdk.KeySyms.Return;
+        keyval = Gdk.Key.Return;
       }
     }
   }

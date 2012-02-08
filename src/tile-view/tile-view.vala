@@ -47,7 +47,7 @@ namespace UI.Widgets
       Tile tile = new Tile (tile_obj, this.icon_size);
       tile.owner = this;
       tile.active_changed.connect (this.on_tile_active_changed);
-      tile.size_allocate.connect (this.on_tile_size_allocated);
+      // tile.size_allocate.connect (this.on_tile_size_allocated);
       tile.show ();
 
       tiles.append (tile);
@@ -80,7 +80,7 @@ namespace UI.Widgets
 
       tile.hide ();
       tile.active_changed.disconnect (this.on_tile_active_changed);
-      tile.size_allocate.disconnect (this.on_tile_size_allocated);
+      // tile.size_allocate.disconnect (this.on_tile_size_allocated);
       tile.owner = null;
 
       box.remove (tile);
@@ -172,12 +172,16 @@ namespace UI.Widgets
       var va = Gdk.Rectangle ();
       va.x = 0;
       va.y = (int) scroll.get_vadjustment ().get_value ();
+
       va.width = alloc.width;
-      va.height = this.get_parent ().allocation.height;
 
-      var va_region = Gdk.Region.rectangle (va);
+	  Gtk.Allocation parrent_alloc;
+	  this.get_parent ().get_allocation (out parrent_alloc);
+      va.height = parrent_alloc.height;
 
-      if (va_region.rect_in (alloc) != Gdk.OverlapType.IN)
+      var va_region = new Cairo.Region.rectangle ((Cairo.RectangleInt)va);
+
+      if (va_region.contains_rectangle ((Cairo.RectangleInt)alloc) != Cairo.RegionOverlap.IN)
       {
         double delta = 0.0;
         if (alloc.y + alloc.height > va.y + va.height)
@@ -201,12 +205,17 @@ namespace UI.Widgets
 
       clear_selection ();
 
-      for (int i=0; i<tiles.length (); i++)
+      for (int i = 0; i < tiles.length (); i++)
       {
-        unowned Tile t = tiles.nth_data (i);
-        Gdk.Rectangle *rect_ptr = (Gdk.Rectangle*) (&t.allocation);
-        var region = Gdk.Region.rectangle (*rect_ptr);
-        if (region.point_in ((int) event.x, (int) event.y))
+        unowned Tile tile = tiles.nth_data (i);
+		unowned Allocation allocation;
+		tile.get_allocation (out allocation);
+		
+        Cairo.RectangleInt rect = (Cairo.RectangleInt) (allocation);
+		
+        var region = new Cairo.Region.rectangle (rect);
+		
+        if (region.contains_point ((int) event.x, (int) event.y))
         {
           this.select (i);
           break;
@@ -258,7 +267,7 @@ namespace UI.Widgets
         clear_selection ();
       }
 
-      if (this.get_parent () != null && this.get_parent ().is_realized ())
+      if (this.get_parent () != null && this.get_parent ().get_realized ())
       {
         this.get_parent ().queue_draw ();
       }

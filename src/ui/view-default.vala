@@ -246,23 +246,33 @@ namespace Synapse.Gui
         {
           ctx.translate (0.5, 0.5);
           ctx.set_operator (Operator.OVER);
-          Utils.cairo_make_shadow_for_rect (ctx, results_container.allocation.x,
-                                                 results_container.allocation.y,
-                                                 results_container.allocation.width - 1,
-                                                 results_container.allocation.height - 1,
+		  Gtk.Allocation alloc;
+		  results_container.get_allocation (out alloc);
+          Utils.cairo_make_shadow_for_rect (ctx, alloc.x,
+                                                 alloc.y,
+                                                 alloc.width - 1,
+                                                 alloc.height - 1,
                                                  0, r, g, b, SHADOW_SIZE);
           ctx.translate (-0.5, -0.5);
         }
+		
+		Gtk.Allocation alloc;
+		spacer.get_allocation (out alloc);
         ctx.set_operator (Operator.SOURCE);
         ch.set_source_rgba (ctx, 1.0, ch.StyleType.BASE, Gtk.StateType.NORMAL);
-        ctx.rectangle (spacer.allocation.x, spacer.allocation.y + BORDER_RADIUS, spacer.allocation.width, SHADOW_SIZE);
+        ctx.rectangle (alloc.x, alloc.y + BORDER_RADIUS, alloc.width, SHADOW_SIZE);
         ctx.fill ();
       }
 
-      int width = this.allocation.width;
-      int height = spacer.allocation.y + BORDER_RADIUS + SHADOW_SIZE;
-
-      int delta = flag_selector.allocation.y - BORDER_RADIUS;
+	  
+	  Gtk.Allocation this_alloc, spacer_alloc, flag_selector_alloc;
+	  this.get_allocation (out this_alloc);
+	  spacer.get_allocation (out spacer_alloc);
+	  flag_selector.get_allocation (out flag_selector_alloc);
+	  
+      int width  = this_alloc.width;
+      int height = spacer_alloc.y + BORDER_RADIUS + SHADOW_SIZE;
+      int delta = flag_selector_alloc.y - BORDER_RADIUS;
       if (!comp) delta = 0;
       
       ctx.save ();

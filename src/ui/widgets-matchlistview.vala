@@ -197,9 +197,9 @@ namespace Synapse.Gui
       {
         s = Markup.printf_escaped (title_markup, m.title);
       }
-      layout.set_markup (s, -1);
-      layout.set_width (Pango.SCALE * width);
-      Pango.cairo_show_layout (ctx, layout);
+      // FIXME: layout.set_markup (s, -1);
+      // FIXME: layout.set_width (Pango.SCALE * width);
+      // Pango.cairo_show_layout (ctx, layout);
 
       bool has_extended_info = show_extended_info && (m is ExtendedInfo);
       if (hide_extended_on_selected && selected) has_extended_info = false;
@@ -211,10 +211,10 @@ namespace Synapse.Gui
         ctx.save ();
         s = Markup.printf_escaped (extended_info_markup, (m as ExtendedInfo).extended_info ?? "");
         s = description_markup.printf (s);
-        layout.set_markup (s, -1);
-        layout.set_width (Pango.SCALE * width_for_description);
+        // layout.set_markup (s, -1);
+        // layout.set_width (Pango.SCALE * width_for_description);
         int w = 0, h = 0;
-        layout.get_pixel_size (out w, out h);
+        // layout.get_pixel_size (out w, out h);
         w += _cell_hpadding * 2;
         
         width_for_description -= w;
@@ -223,24 +223,24 @@ namespace Synapse.Gui
           ctx.translate (- width + w, text_height - h);
         else
           ctx.translate (width - w, text_height - h);
-        Pango.cairo_show_layout (ctx, layout);
+        // FIXME: Pango.cairo_show_layout (ctx, layout);
         ctx.restore ();
       }
       
       /* ------------------ draw description --------------------- */
       s = Markup.printf_escaped (description_markup, Utils.get_printable_description (m));
 
-      layout.set_markup (s, -1);
-      layout.set_width (Pango.SCALE * width_for_description);
+      // FIXME: layout.set_markup (s, -1);
+      // FIXME: layout.set_width (Pango.SCALE * width_for_description);
       int w = 0, h = 0;
-      layout.get_pixel_size (out w, out h);
+      // FIXME: layout.get_pixel_size (out w, out h);
       
       if (rtl == Gtk.TextDirection.RTL) 
         ctx.translate (width - width_for_description, text_height - h);
       else
         ctx.translate (0, text_height - h);
 
-      Pango.cairo_show_layout (ctx, layout);
+      // FIXME: Pango.cairo_show_layout (ctx, layout);
       ctx.restore ();
     }
   }
@@ -400,7 +400,7 @@ namespace Synapse.Gui
         this.queue_resize (); // queue_resize, so MatchListView will query for new row_height_request
       }
 
-      public override bool expose_event (Gdk.EventExpose event) {
+      public bool expose_event (Gdk.EventExpose event) {
         //Transparent.
         return true;
       }
@@ -449,7 +449,7 @@ namespace Synapse.Gui
 
       this.items = null;
       
-      this.size_allocate.connect (this.update_target_offsets);
+      // FIXME: this.size_allocate.connect (this.update_target_offsets);
       this.notify["behavior"].connect (this.update_target_offsets);
       this.notify["min-visible-rows"].connect (this.queue_resize);
       this.notify["animation-enabled"].connect (()=>{
@@ -462,14 +462,14 @@ namespace Synapse.Gui
       if (b) callback (this.renderer);
     }
     
-    public override void size_allocate (Gdk.Rectangle allocation)
+    public override void size_allocate (Gtk.Allocation allocation)
     {
       base.size_allocate (allocation);
       renderer.size_allocate ({ 0, 0, 0, 0 });
     }
-    public override void size_request (out Requisition requisition)
+    public void size_request (out Requisition requisition)
     {
-      base.size_request (out requisition);
+      base.get_preferred_size (out requisition, out requisition);
       int tmp = this.renderer.get_row_height_request ();
       if (tmp != this.row_height)
       {
@@ -503,7 +503,7 @@ namespace Synapse.Gui
     
     private bool update_current_offsets ()
     {
-      if (! (animation_enabled && this.is_realized ()) )
+      if (! (animation_enabled && this.get_realized ()) )
       {
         this.tid = 0;
         this.offset = this.toffset;
@@ -562,7 +562,10 @@ namespace Synapse.Gui
     
     private void update_target_offsets ()
     {
-      int visible_items = this.allocation.height / this.row_height;
+	  Gtk.Allocation allocation;
+	  this.get_allocation (out allocation);
+	  
+      int visible_items = allocation.height / this.row_height;
       
       switch (this.behavior)
       {
@@ -578,11 +581,11 @@ namespace Synapse.Gui
           }
           else if (this.goto_index >= ( this.items.size - 1 - (visible_items / 2) ))
           {
-            this.toffset = this.row_height * this.items.size - this.allocation.height;
+            this.toffset = this.row_height * this.items.size - allocation.height;
           }
           else
           {
-            this.toffset = this.row_height * this.goto_index - this.allocation.height / 2 + this.row_height / 2;
+            this.toffset = this.row_height * this.goto_index - allocation.height / 2 + this.row_height / 2;
           }
           break;
       }
@@ -615,12 +618,14 @@ namespace Synapse.Gui
       return this.items == null ? 0 : this.items.size;
     }
     
-    public override bool expose_event (Gdk.EventExpose event)
+    public bool expose_event (Gdk.EventExpose event)
     {
+	  Gtk.Allocation allocation;
+	  this.get_allocation (out allocation);
       /* Clip */
-      Cairo.Context ctx = Gdk.cairo_create (this.window);
-      ctx.translate (this.allocation.x, this.allocation.y);
-      ctx.rectangle (0, 0, this.allocation.width, this.allocation.height);
+      Cairo.Context ctx = Gdk.cairo_create (this.get_window ());
+      ctx.translate (allocation.x, allocation.y);
+      ctx.rectangle (0, 0, allocation.width, allocation.height);
       ctx.clip ();
       ctx.set_operator (Cairo.Operator.OVER);
       
@@ -634,7 +639,7 @@ namespace Synapse.Gui
 
       ctx.set_font_options (this.get_screen().get_font_options());
 
-      int visible_items = this.allocation.height / this.row_height + 2;
+      int visible_items = allocation.height / this.row_height + 2;
       int i = get_item_at_pos (0);
       visible_items += i;
       
@@ -642,29 +647,32 @@ namespace Synapse.Gui
 
       if (this.select_index >= 0 && this.selection_enabled)
       {
-        if (this.soffset > (-this.row_height) && this.soffset < this.allocation.height)
+        if (this.soffset > (-this.row_height) && this.soffset < allocation.height)
         {
-          bool had_focus = Gtk.WidgetFlags.HAS_FOCUS in this.get_flags ();
+          bool had_focus = Gtk.StateFlags.FOCUSED in this.get_state_flags ();
           // fool theme engine to use proper bg color
-          if (!had_focus) this.set_flags (Gtk.WidgetFlags.HAS_FOCUS);
-          ypos = int.max (this.soffset, 0) + this.allocation.y;
-          event.area.x = this.allocation.x;
-          event.area.width = this.allocation.width;
-          Gtk.paint_flat_box (this.style, event.window, StateType.SELECTED,
-                              ShadowType.NONE, event.area, this, "cell_odd",
-                              this.allocation.x, ypos,
-                              this.allocation.width, this.row_height);
-          if (!had_focus) this.unset_flags (Gtk.WidgetFlags.HAS_FOCUS);
+          if (!had_focus) this.set_state_flags (Gtk.StateFlags.FOCUSED, false);
+          ypos = int.max (this.soffset, 0) + allocation.y;
+          event.area.x = allocation.x;
+          event.area.width = allocation.width;
+          // FIXME: Gtk.paint_flat_box (this.style, event.window, StateType.SELECTED,
+          //                     ShadowType.NONE, event.area, this, "cell_odd",
+          //                     allocation.x, ypos,
+          //                     allocation.width, this.row_height);
+          if (!had_focus) this.unset_state_flags (Gtk.StateFlags.FOCUSED);
         }
       }
       double pct = 1.0;
       for (; i < visible_items && i < this.items.size; ++i)
       {
+		Gtk.Allocation alloc;
+		this.get_allocation (out alloc);
+
         ypos = i * this.row_height - this.offset;
-        if (ypos > this.allocation.height) break;
+        if (ypos > alloc.height) break;
         ctx.save ();
         ctx.translate (0, ypos);
-        ctx.rectangle (0, 0, this.allocation.width, this.row_height);
+        ctx.rectangle (0, 0, alloc.width, this.row_height);
         ctx.clip ();
         pct = 1.0;
         if (this.selection_enabled && i == select_index)
@@ -674,7 +682,7 @@ namespace Synapse.Gui
           if (pct == 0.0) pct = (Math.fabs (this.tsoffset - this.soffset) / this.row_height);
           pct = 2.0 - double.min (1.0 , pct);
         }
-        renderer.render_match (ctx, this.items.get (i), this.allocation.width, this.row_height, this.use_base_colors, pct);
+        renderer.render_match (ctx, this.items.get (i), allocation.width, this.row_height, this.use_base_colors, pct);
         ctx.restore ();
       }
       
@@ -842,17 +850,23 @@ namespace Synapse.Gui
 		  logo.set_state (state);
 		}
 		
-		public override bool expose_event (Gdk.EventExpose event)
+		public bool expose_event (Gdk.EventExpose event)
 		{
 		  if (_use_base_colors)
 		  {
+			Gtk.Allocation allocation;
+			this.get_allocation (out allocation);
+			
+			Gtk.Allocation status_allocation;
+			status.get_allocation (out status_allocation);
+			
         var ctx = Gdk.cairo_create (this.get_window ());
         ctx.set_operator (Cairo.Operator.OVER);
-        ctx.translate (this.allocation.x, status.allocation.y);
-        ctx.rectangle (0, 0, this.allocation.width, status.allocation.height);
+        ctx.translate (allocation.x, status_allocation.y);
+        ctx.rectangle (0, 0, allocation.width, status_allocation.height);
         ctx.clip ();
         /* Prepare bg's colors using GtkStyle */
-        Pattern pat = new Pattern.linear(0, 0, 0, status.allocation.height);
+        Pattern pat = new Pattern.linear(0, 0, 0, status_allocation.height);
         
         StateType t = this.get_state ();
         ch.add_color_stop_rgba (pat, 0.0, 0.95, ch.StyleType.BG, t);
@@ -862,7 +876,7 @@ namespace Synapse.Gui
         ctx.paint ();
       }
       /* Propagate Expose */               
-      this.propagate_expose (this.get_child(), event);
+      // FIXME: this.propagate_expose (this.get_child(), event);
       
       return true;
     }
@@ -872,9 +886,9 @@ namespace Synapse.Gui
       return this.view;
     }
 
-    public override void size_request (out Requisition requisition)
+    public void size_request (out Requisition requisition)
     {
-      vbox.size_request (out requisition);
+	  vbox.get_preferred_size (out requisition, out requisition);
       requisition.width = int.max (requisition.width, this.mwidth);
     }
 

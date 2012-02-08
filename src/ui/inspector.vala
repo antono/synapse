@@ -65,30 +65,31 @@ namespace UI
       Gdk.Window? window = Gdk.Window.at_pointer (out win_x, out win_y);
       if (window != null)
       {
-        unowned Widget widget = null;
+		// FIXME
+        // unowned Widget widget = null;
         
-        window.get_user_data (&widget);
-        if (widget is Container)
-        {
-          widget = find_child (widget as Container, win_x, win_y);
-        }
+        // window.get_user_data (out widget);
+        // if (widget is Container)
+        // {
+        //   widget = find_child (widget as Container, win_x, win_y);
+        // }
 
-        if (last_exposed != null)
-        {
-          last_exposed.expose_event.disconnect (this.paint_border);
-          last_exposed.queue_draw ();
-        }
-        if (last_exposed_container != null)
-        {
-          last_exposed_container.expose_event.disconnect (this.paint_border);
-          last_exposed_container.queue_draw ();
-        }
-        last_exposed = widget;
-        last_exposed_container = widget.get_parent ();
-        widget.expose_event.connect_after (this.paint_border);
-        widget.queue_draw ();
-        last_exposed_container.expose_event.connect_after (this.paint_border);
-        last_exposed_container.queue_draw ();
+        // if (last_exposed != null)
+        // {
+        //   // last_exposed.expose_event.disconnect (this.paint_border);
+        //   last_exposed.queue_draw ();
+        // }
+        // if (last_exposed_container != null)
+        // {
+        //   // last_exposed_container.expose_event.disconnect (this.paint_border);
+        //   last_exposed_container.queue_draw ();
+        // }
+        // last_exposed = widget;
+        // last_exposed_container = widget.get_parent ();
+        // // widget.expose_event.connect_after (this.paint_border);
+        // widget.queue_draw ();
+        // // last_exposed_container.expose_event.connect_after (this.paint_border);
+        // last_exposed_container.queue_draw ();
       }
       return true;
     }
@@ -109,17 +110,20 @@ namespace UI
         cr.set_source_rgb (1.0, 0.0, 0.0);
       }
       cr.translate (0.5, 0.5);
-      cr.rectangle (widget.allocation.x, widget.allocation.y,
-                    widget.allocation.width-1, widget.allocation.height-1);
+
+	  Gtk.Allocation wa;
+	  widget.get_allocation (out wa);
+      cr.rectangle (wa.x,       wa.y,
+                    wa.width-1, wa.height-1);
       cr.stroke ();
       
       Cairo.TextExtents ext;
       unowned string widget_name = widget.get_type ().name ();
       cr.text_extents (widget_name, out ext);
-      if (widget.allocation.width >= ext.width && widget.allocation.height >= ext.height)
+      if (wa.width >= ext.width && wa.height >= ext.height)
       {
-        cr.move_to (widget.allocation.x + widget.allocation.width - ext.width - 1,
-                    widget.allocation.y + ext.height);
+        cr.move_to (wa.x + wa.width - ext.width - 1,
+                    wa.y + ext.height);
         cr.show_text (widget_name);
       }
       return false;

@@ -1,4 +1,4 @@
-AC_INIT([synapse], [0.2.9])
+AC_INIT([synapse], [0.3.0])
 AC_DEFINE(RELEASE_NAME, "Bombesin", "Codename of this release")
 
 AC_CONFIG_MACRO_DIR([m4])
@@ -48,22 +48,23 @@ dnl ==============================================
 dnl Check that we meet the dependencies
 dnl ==============================================
 MIN_GLIB_VERSION=2.22.0
-MIN_GTK_VERSION=2.20.0
+MIN_GTK_VERSION=3.0.0
 MIN_ZEITGEIST_VERSION=0.2.14
-MIN_GEE_VERSION=0.5.2
+MIN_GEE_VERSION=0.6.0
 MIN_JSON_VERSION=0.10.0
 APPINDICATOR_REQUIRED=0.0.7
 
 PKG_CHECK_MODULES(SYNAPSE_MODULES, \
   glib-2.0 >= $MIN_GLIB_VERSION \
-  gtk+-2.0 >= $MIN_GTK_VERSION \
-  gtkhotkey-1.0 \
+  gtk+-3.0 >= $MIN_GTK_VERSION \
+  dnl gtkhotkey-1.0 \
   gobject-2.0 \
   gee-1.0 >= $MIN_GEE_VERSION \
   gio-unix-2.0 \
+  gio-2.0 \
   json-glib-1.0 >= $MIN_JSON_VERSION \
   libnotify \
-  unique-1.0 \
+  dnl unique-1.0 \
   )
 
 
@@ -95,15 +96,15 @@ fi
 AM_CONDITIONAL(HAVE_ZEITGEIST, test "x$enable_zeitgeist" = "xyes")
 
 if test "x$enable_indicator" = "xauto" ; then
-	PKG_CHECK_EXISTS([appindicator-0.1 >= $APPINDICATOR_REQUIRED],
+	PKG_CHECK_EXISTS([appindicator3-0.1 >= $APPINDICATOR_REQUIRED],
 	                 enable_indicator="yes",
 	                 enable_indicator="no")
 fi
 
 if test "x$enable_indicator" = "xyes" ; then
-	PKG_CHECK_EXISTS([appindicator-0.1 >= $APPINDICATOR_REQUIRED],,
-	                 AC_MSG_ERROR([appindicator-0.1 is not installed]))
-	PKG_CHECK_MODULES(APP_INDICATOR, appindicator-0.1 >= $APPINDICATOR_REQUIRED)
+	PKG_CHECK_EXISTS([appindicator3-0.1 >= $APPINDICATOR_REQUIRED],,
+	                 AC_MSG_ERROR([appindicator3-0.1 is not installed]))
+	PKG_CHECK_MODULES(APP_INDICATOR, appindicator3-0.1 >= $APPINDICATOR_REQUIRED)
 	AC_DEFINE(HAVE_INDICATOR, 1, [Have AppIndicator])
 fi
 AM_CONDITIONAL(HAVE_INDICATOR, test "x$enable_indicator" = "xyes")

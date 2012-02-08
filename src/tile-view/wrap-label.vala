@@ -52,7 +52,7 @@ namespace UI.Widgets
     {
     }
 
-    protected override void size_allocate (Gdk.Rectangle allocation)
+    protected override void size_allocate (Gtk.Allocation allocation)
     {
       var layout = this.get_layout ();
       layout.set_width (allocation.width * Pango.SCALE);
@@ -62,13 +62,23 @@ namespace UI.Widgets
 
       this.height_request = lh;
 
-      base.size_allocate (allocation);
+      base.size_allocate ((Gtk.Allocation)allocation);
     }
 
-    protected override void size_request (out Gtk.Requisition req)
+    protected void size_request (out Gtk.Requisition req)
     {
-      base.size_request (out req);
+      // base.size_request (out req);
+	  int natural_width;
+	  int natural_height;
+	  base.get_preferred_width (out req.width, out natural_width);
+	  base.get_preferred_height (out req.width, out natural_height);
       if (_wrap) req.width = 1;
     }
+	
+    // protected override void get_preferred_width (out int min_width, out int natural_width)
+	// {
+    //   base.get_preferred_width (out min_width, out natural_width);
+    //   if (_wrap) min_width = natural_width = 1;
+	// }
   }
 }

@@ -43,7 +43,7 @@ namespace Synapse
     private DataSink data_sink;
     private Gui.KeyComboConfig key_combo_config;
     private Gui.CategoryConfig category_config;
-    private GtkHotkey.Info? hotkey;
+    // private GtkHotkey.Info? hotkey;
     private ConfigService config;
 #if HAVE_INDICATOR
     private AppIndicator.Indicator indicator;
@@ -101,7 +101,7 @@ namespace Synapse
     
     private void init_indicator ()
     {
-      var indicator_menu = new Menu ();
+      var indicator_menu = new Gtk.Menu ();
       var activate_item = new ImageMenuItem.with_label (_ ("Activate"));
       activate_item.set_image (new Gtk.Image.from_stock (Gtk.Stock.EXECUTE, Gtk.IconSize.MENU));
       activate_item.activate.connect (() =>
@@ -208,72 +208,74 @@ namespace Synapse
     
     private void bind_keyboard_shortcut ()
     {
-      var registry = GtkHotkey.Registry.get_default ();
-      try
-      {
-        if (registry.has_hotkey ("synapse", "activate"))
-        {
-          hotkey = registry.get_hotkey ("synapse", "activate");
-        }
-        else
-        {
-          hotkey = new GtkHotkey.Info ("synapse", "activate",
-                                       "<Control>space", null);
-          registry.store_hotkey (hotkey);
-        }
-        Utils.Logger.log (this, "Binding activation to %s", hotkey.signature);
-        settings.set_keybinding (hotkey.signature, false);
-        hotkey.bind ();
-        hotkey.activated.connect ((event_time) => { this.show_ui (event_time); });
-      }
-      catch (Error err)
-      {
-        warning ("%s", err.message);
-        var d = new MessageDialog (settings.visible ? settings : null, 0, MessageType.ERROR, 
-                                     ButtonsType.CLOSE,
-                                     "%s", err.message);
-        d.run ();
-        d.destroy ();
-      }/* */
+      // FIXME: gtkhotkey
+      // var registry = GtkHotkey.Registry.get_default ();
+      // try
+      // {
+      //   if (registry.has_hotkey ("synapse", "activate"))
+      //   {
+      //     hotkey = registry.get_hotkey ("synapse", "activate");
+      //   }
+      //   else
+      //   {
+      //     hotkey = new GtkHotkey.Info ("synapse", "activate",
+      //                                  "<Control>space", null);
+      //     registry.store_hotkey (hotkey);
+      //   }
+      //   Utils.Logger.log (this, "Binding activation to %s", hotkey.signature);
+      //   settings.set_keybinding (hotkey.signature, false);
+      //   hotkey.bind ();
+      //   hotkey.activated.connect ((event_time) => { this.show_ui (event_time); });
+      // }
+      // catch (Error err)
+      // {
+      //   warning ("%s", err.message);
+      //   var d = new MessageDialog (settings.visible ? settings : null, 0, MessageType.ERROR, 
+      //                                ButtonsType.CLOSE,
+      //                                "%s", err.message);
+      //   d.run ();
+      //   d.destroy ();
+      // }/* */
     }
     
     private void change_keyboard_shortcut (string key)
     {
-      var registry = GtkHotkey.Registry.get_default ();
-      try
-      {
-        if (hotkey.is_bound ()) hotkey.unbind ();
-      }
-      catch (Error err)
-      {
-        warning ("%s", err.message);
-      }
+      // FIXME:
+      // var registry = GtkHotkey.Registry.get_default ();
+      // try
+      // {
+      //   if (hotkey.is_bound ()) hotkey.unbind ();
+      // }
+      // catch (Error err)
+      // {
+      //   warning ("%s", err.message);
+      // }
       
-      try
-      {
-        if (registry.has_hotkey ("synapse", "activate"))
-        {
-          registry.delete_hotkey ("synapse", "activate");
-        }
+      // try
+      // {
+      //   if (registry.has_hotkey ("synapse", "activate"))
+      //   {
+      //     registry.delete_hotkey ("synapse", "activate");
+      //   }
         
-        if (key != "")
-        {
-          hotkey = new GtkHotkey.Info ("synapse", "activate",
-                                       key, null);
-          registry.store_hotkey (hotkey);
-          hotkey.bind ();
-          hotkey.activated.connect ((event_time) => { this.show_ui (event_time); });
-        }
-      }
-      catch (Error err)
-      {
-        Gtk.MessageDialog dialog = new Gtk.MessageDialog (this.settings, 0,
-          Gtk.MessageType.WARNING, Gtk.ButtonsType.OK,
-          "%s", err.message
-        );
-        dialog.run ();
-        dialog.destroy ();
-      }
+      //   if (key != "")
+      //   {
+      //     hotkey = new GtkHotkey.Info ("synapse", "activate",
+      //                                  key, null);
+      //     registry.store_hotkey (hotkey);
+      //     hotkey.bind ();
+      //     hotkey.activated.connect ((event_time) => { this.show_ui (event_time); });
+      //   }
+      // }
+      // catch (Error err)
+      // {
+      //   Gtk.MessageDialog dialog = new Gtk.MessageDialog (this.settings, 0,
+      //     Gtk.MessageType.WARNING, Gtk.ButtonsType.OK,
+      //     "%s", err.message
+      //   );
+      //   dialog.run ();
+      //   dialog.destroy ();
+      // }
     }
 
     public void run ()
@@ -330,26 +332,25 @@ namespace Synapse
         Gtk.init (ref argv);
         Notify.init ("synapse");
         
-        var app = new Unique.App ("org.gnome.Synapse", null);
-        if (app.is_running)
+        var app = new Gtk.Application ("org.gnome.Synapse", ApplicationFlags.FLAGS_NONE);
+        if (app.is_remote)
         {
           Utils.Logger.log (null, "Synapse is already running, activating...");
-          app.send_message (Unique.Command.ACTIVATE, null);
+          // FIXME: app.send_message (Unique.Command.ACTIVATE, null);
         }
         else
         {
           var launcher = new UILauncher ();
-          app.message_received.connect ((cmd, data, event_time) =>
-          {
-            if (cmd == Unique.Command.ACTIVATE)
-            {
-              launcher.show_ui (event_time);
+          // FIXME: app.message_received.connect ((cmd, data, event_time) =>
+          // {
+          //   if (cmd == Unique.Command.ACTIVATE)
+          //   {
+          //     launcher.show_ui (event_time);
+          //     return Unique.Response.OK;
+          //   }
 
-              return Unique.Response.OK;
-            }
-
-            return Unique.Response.PASSTHROUGH;
-          });
+          //   return Unique.Response.PASSTHROUGH;
+          // });
           launcher.run ();
         }
       }

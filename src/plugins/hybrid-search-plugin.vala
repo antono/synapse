@@ -129,7 +129,7 @@ namespace Synapse
         try
         {
           load_ok = yield recent.load_contents_async (null,
-                                                      out file_contents);
+                                                      out file_contents, null);
         }
         catch (GLib.Error load_error)
         {
@@ -142,7 +142,7 @@ namespace Synapse
           recent = File.new_for_path (Path.build_filename (
             Environment.get_user_data_dir (), RECENT_XML_NAME, null));
           load_ok = yield recent.load_contents_async (null,
-                                                      out file_contents);
+                                                      out file_contents, null);
         }
 
         if (load_ok)
@@ -399,12 +399,13 @@ namespace Synapse
         {
           var dir_info = yield dir.query_info_async ("time::*", 0, 0, null);
           var t = TimeVal ();
-          dir_info.get_modification_time (out t);
-          if (t.tv_sec > di.last_update.tv_sec)
-          {
-            // the directory was changed, let's update
-            yield update_directory_contents (dir, di);
-          }
+		  // FIXME: api changed?
+          // dir_info.get_modification_time (out t);
+          // if (t.tv_sec > di.last_update.tv_sec)
+          // {
+          //   // the directory was changed, let's update
+          //   yield update_directory_contents (dir, di);
+          // }
         }
         catch (Error err)
         {

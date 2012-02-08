@@ -36,7 +36,9 @@ namespace Synapse
     
     private void update_wm ()
     {
-      string wmname = Gdk.x11_screen_get_window_manager_name (Gdk.Screen.get_default ()).down ();
+      // FIXME: string wmname = Gdk.x11_screen_get_window_manager_name
+      // (Gdk.Screen.get_default ()).down ();
+	  string wmname = "GNOME";
       this.is_kwin = wmname == "kwin";
     }
     
@@ -217,34 +219,35 @@ namespace Synapse
       
     }
     
-    public override void size_allocate (Gdk.Rectangle alloc)
+    public override void size_allocate (Gtk.Allocation alloc)
     {
       base.size_allocate (alloc);
-      if (this.is_kwin && 
-          (old_alloc.width != this.allocation.width || 
-           old_alloc.height != this.allocation.height)
-         )
-      {
-        this.add_kde_compatibility (this, this.allocation.width, this.allocation.height);
-        this.old_alloc = {
-          this.allocation.width,
-          this.allocation.height
-        };
-      }
+
+      // if (this.is_kwin && 
+      //     (old_alloc.width != this.allocation.width || 
+      //      old_alloc.height != this.allocation.height)
+      //    )
+      // {
+      //   this.add_kde_compatibility (this, this.allocation.width, this.allocation.height);
+      //   this.old_alloc = {
+      //     this.allocation.width,
+      //     this.allocation.height
+      //   };
+      // }
     }
     
     public override void composited_changed ()
     {
       Gdk.Screen screen = this.get_screen ();
       bool comp = screen.is_composited ();
-      Gdk.Colormap? cm = screen.get_rgba_colormap();
-      if (cm == null)
-      {
-        comp = false;
-        cm = screen.get_rgb_colormap();
-      }
-      Synapse.Utils.Logger.log (this, "Screen is%s composited.", comp ? "": " NOT");
-      this.set_colormap (cm);
+      // Gdk.Colormap? cm = screen.get_rgba_colormap();
+      // if (cm == null)
+      // {
+      //   comp = false;
+      //   cm = screen.get_rgb_colormap();
+      // }
+      // Synapse.Utils.Logger.log (this, "Screen is%s composited.", comp ? "": " NOT");
+      // this.set_colormap (cm);
 
       update_wm ();
       update_border_and_shadow ();
@@ -254,13 +257,13 @@ namespace Synapse
     {
       /* Fix to the horrible shadow glitches in KDE 4 */
       /* If shape mask is set, KWin will not add that horrible shadow */
-      var bitmap = new Gdk.Pixmap (null, w, h, 1);
-      var ctx = Gdk.cairo_create (bitmap);
-      ctx.set_source_rgba (0, 0, 0, 1);
-      ctx.set_operator (Cairo.Operator.SOURCE);
-      ctx.paint ();
-      window.shape_combine_mask (null, 0, 0);
-      window.shape_combine_mask ((Gdk.Bitmap*)bitmap, 0, 0);
+      // var bitmap = new Gdk.Pixmap (null, w, h, 1);
+      // var ctx = Gdk.cairo_create (bitmap);
+      // ctx.set_source_rgba (0, 0, 0, 1);
+      // ctx.set_operator (Cairo.Operator.SOURCE);
+      // ctx.paint ();
+      // window.shape_combine_mask (null, 0, 0);
+      // window.shape_combine_mask ((Gdk.Bitmap*)bitmap, 0, 0);
     }
     
     public override void style_set (Gtk.Style? old)
@@ -319,32 +322,37 @@ namespace Synapse
       return false;
     }
     
-    public override void size_request (out Requisition requisition)
+    public void size_request (out Requisition requisition)
     {
-      base.size_request (out requisition);
+	  base.get_preferred_size (out requisition, out requisition);
+	  Gtk.Allocation allocation;
+	  this.get_allocation (out allocation);
       /* if the size requested is different => redraw () */
-      if (this.is_realized () && (
-            this.allocation.height != requisition.height ||
-            this.allocation.width != requisition.width
+      if (this.get_realized () && (
+            allocation.height != requisition.height ||
+            allocation.width  != requisition.width
           ))
       {
         this.queue_draw ();
       }
     }
     
-    public override bool expose_event (Gdk.EventExpose event)
+    public bool expose_event (Gdk.EventExpose event)
     {
-      Cairo.Context ctx = Gdk.cairo_create (this.window);
+	  Gtk.Allocation allocation;
+	  this.get_allocation (out allocation);
+	  
+      Cairo.Context ctx = Gdk.cairo_create (this.get_window ());
       ctx.set_operator (Cairo.Operator.CLEAR);
       ctx.paint ();
 
       /* Propagate Expose */
-      this.propagate_expose (this.get_child(), event);
+      // FIXME: this.propagate_expose (this.get_child(), event);
       
-      ctx.rectangle (0, 0, this.allocation.width, this.allocation.height);
+      ctx.rectangle (0, 0, allocation.width, allocation.height);
       ctx.clip ();
       
-      string key = "%dx%dx%d".printf (this.allocation.width, this.allocation.height, model.searching_for);
+      string key = "%dx%dx%d".printf (allocation.width, allocation.height, model.searching_for);
       
       if (cache_enabled)
       {
@@ -356,8 +364,8 @@ namespace Synapse
         {
           Cairo.Surface surf = new Cairo.Surface.similar (ctx.get_target (),
                                                           Cairo.Content.COLOR_ALPHA,
-                                                          this.allocation.width,
-                                                          this.allocation.height);
+                                                          allocation.width,
+                                                          allocation.height);
           Cairo.Context cr = new Cairo.Context (surf);
           paint_background (cr);
           bg_cache[key] = surf;
@@ -426,11 +434,13 @@ namespace Synapse
     
     public virtual void summon ()
     {
+	  // Gtk.Allocation allocation;
+	  // this.get_allocation (out allocation);
       this.set_list_visible (true);
       Gui.Utils.move_window_to_center (this);
       this.set_list_visible (false);
       this.show ();
-      if (this.is_kwin) this.add_kde_compatibility (this, this.allocation.width, this.allocation.height);
+      // FIXME: if (this.is_kwin) this.add_kde_compatibility (this, allocation.width, allocation.height);
       Gui.Utils.present_window (this);
       this.queue_draw ();
       this.summoned ();

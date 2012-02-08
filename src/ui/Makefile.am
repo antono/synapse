@@ -7,14 +7,13 @@ VAPIDIR = $(top_srcdir)/vapi
 
 synapse_VALAFLAGS = \
 	--pkg dbus-glib-1 \
-	--pkg gtk+-2.0 \
-	--pkg gdk-x11-2.0 \
+	--pkg gtk+-3.0 \
+	--pkg gdk-3.0 \
 	--pkg gio-2.0 \
 	--pkg gio-unix-2.0 \
 	--pkg zeitgeist-1.0 \
 	--pkg gee-1.0 \
 	--pkg json-glib-1.0 \
-	--pkg unique-1.0 \
 	--pkg libnotify \
 	--vapidir $(top_builddir)/src/core \
 	--pkg synapse-core \
@@ -23,11 +22,11 @@ synapse_VALAFLAGS = \
 	--vapidir $(top_builddir)/src/tile-view \
 	--pkg tile-view \
 	--vapidir $(VAPIDIR) \
-	--pkg gtkhotkey-1.0 \
-	$(VAPIDIR)/keysyms.vapi \
 	$(VAPIDIR)/cancellable-fix.vapi \
 	$(VAPIDIR)/config.vapi \
 	$(NULL)
+
+# --pkg gtkhotkey-1.0
 
 synapse_CFLAGS = \
 	$(SYNAPSE_MODULES_CFLAGS) \
@@ -71,10 +70,6 @@ synapse_VALASOURCES = \
 	model.vala \
 	view-base.vala \
 	view-default.vala \
-	view-essential.vala \
-	view-doish.vala \
-	view-side-doish.vala \
-	view-virgilio.vala \
 	widgets.vala \
 	widgets-matchlistview.vala \
 	icon-cache-service.vala \
@@ -82,6 +77,11 @@ synapse_VALASOURCES = \
 	settings.vala \
 	inspector.vala \
 	$(NULL)
+
+# view-essential.vala \
+# view-doish.vala \
+# view-side-doish.vala \
+# view-virgilio.vala
 
 GENERATED_C_FILES = $(synapse_VALASOURCES:.vala=.c)
 synapse_SOURCES = $(synapse_VALASOURCES:.vala=.c)

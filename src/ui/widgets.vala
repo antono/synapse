@@ -45,9 +45,9 @@ namespace Synapse.Gui
       this.clone = to_clone;
       this.set_has_window (false);
     }
-    public override void size_request (out Gtk.Requisition req)
+    public void size_request (out Gtk.Requisition req)
     {
-      clone.size_request (out req);
+	  clone.get_preferred_size (out req, out req);
     }
   }
 
@@ -205,7 +205,7 @@ namespace Synapse.Gui
       if (tid != 0) stop_animation ();
     }
     
-    public override void size_allocate (Gdk.Rectangle allocation)
+    public override void size_allocate (Gtk.Allocation allocation)
     {
       base.size_allocate (allocation);
 
@@ -258,12 +258,15 @@ namespace Synapse.Gui
       }
     }
     
-    public override bool expose_event (Gdk.EventExpose event)
+    public bool expose_event (Gdk.EventExpose event)
     {
-      int h = this.allocation.height - this.ypad * 2;
-      int w = this.allocation.width - this.xpad * 2;
-      Cairo.Context ctx = Gdk.cairo_create (this.window);
-      ctx.translate (this.allocation.x + this.xpad, this.allocation.y + this.ypad);
+	  Allocation allocation;
+	  this.get_allocation (out allocation);
+	  
+      int h = allocation.height - this.ypad * 2;
+      int w = allocation.width - this.xpad * 2;
+      Cairo.Context ctx = Gdk.cairo_create (this.get_window ());
+      ctx.translate (allocation.x + this.xpad, allocation.y + this.ypad);
       ctx.rectangle (0, 0, w, h);
       ctx.clip ();
       
@@ -330,7 +333,7 @@ namespace Synapse.Gui
       char_width = int.max (metrics.get_approximate_char_width (), metrics.get_approximate_digit_width ()) / Pango.SCALE;
     }
     
-    public override void size_request (out Requisition req)
+    public void size_request (out Requisition req)
     {
       layout.set_markup ("<span size=\"%s\">%s</span>".printf (size_to_string[_size], this.text), -1);
       int char_width;
@@ -419,13 +422,15 @@ namespace Synapse.Gui
     
     public void select_schema (int i)
     {
+	  Gtk.Allocation alloc;
+	  this.get_allocation (out alloc);
       if (i < 0) return;
       if (i >= schemas.size) return;
       active_schema = i;
-      if (!this.is_realized ()) return;
+      if (!this.get_realized ()) return;
       size_allocate ({
-        this.allocation.x, this.allocation.y,
-        this.allocation.width, this.allocation.height
+        alloc.x,     alloc.y,
+        alloc.width, alloc.height
       });
       queue_resize ();
     }
@@ -459,7 +464,7 @@ namespace Synapse.Gui
       // cannot remove for now :P TODO
     }
     
-    public override void size_request (out Gtk.Requisition req)
+    public void size_request (out Gtk.Requisition req)
     {
       req = {0, 0};
       int i = 0;
@@ -485,7 +490,7 @@ namespace Synapse.Gui
       req.height += _ypad * 2;
     }
     
-    public override void size_allocate (Gdk.Rectangle allocation)
+    public override void size_allocate (Gtk.Allocation allocation)
     {
       base.size_allocate (allocation);
       
@@ -503,24 +508,21 @@ namespace Synapse.Gui
       bool rtl = this.get_direction () == Gtk.TextDirection.RTL;
       foreach (Widget child in children)
       {
-        Gdk.Rectangle a;
+		// FIXME: https://bugzilla.gnome.org/show_bug.cgi?id=669580
+        var a = Gdk.Rectangle ();
         if (alloc.length <= i)
         {
-          a = {
-            0, 0, 0, 0
-          };
+		  a.y = a.y = a.width = a.height = 0;
         }
         else
         {
-          a = {
-            x + alloc[i].x * this._scale_size / 100,
-            y + alloc[i].y * this._scale_size / 100,
-            alloc[i].width * this._scale_size / 100,
-            alloc[i].height * this._scale_size / 100
-          };
+		  a.x = x + alloc[i].x * this._scale_size / 100;
+		  a.y = y + alloc[i].y * this._scale_size / 100;
+		  a.width = alloc[i].width * this._scale_size / 100;
+		  a.height = alloc[i].height * this._scale_size / 100;
         }
         if (rtl) a.x = 2 * allocation.x + allocation.width - a.x - a.width;
-        child.size_allocate (a);
+        // FIXME: child.size_allocate (a);
         i++;
       }
     }
@@ -557,7 +559,7 @@ namespace Synapse.Gui
         
         i++;
       }
-      if (!this.is_realized ()) return;
+      if (!this.get_realized ()) return;
       queue_resize ();
     }
     
@@ -579,18 +581,18 @@ namespace Synapse.Gui
       widget.unparent ();
     }
     
-    public override void size_allocate (Gdk.Rectangle allocation)
+    public override void size_allocate (Gtk.Allocation allocation)
     {
       base.size_allocate (allocation);
       if (active_child >= children.size) return;
       children.get (active_child).size_allocate (allocation);
     }
     
-    public override void size_request (out Requisition req)
+    public void size_request (out Requisition req)
     {
       req = {0, 0};
       if (active_child >= children.size) return;
-      children.get (active_child).size_request (out req);
+      children.get (active_child).get_preferred_size (out req, out req);
     }
   }
 
@@ -601,11 +603,12 @@ namespace Synapse.Gui
       this.notify["active"].connect (this.queue_draw);
     }
 
-    public override bool expose_event (Gdk.EventExpose event)
+    public bool expose_event (Gdk.EventExpose event)
     {
       if (this.active)
       {
-        return base.expose_event (event);
+        // FIXME: return base.expose_event (event);
+		return true;
       }
       return true;
     }
@@ -627,9 +630,9 @@ namespace Synapse.Gui
       this._widget.show ();
     }
     
-    public override bool expose_event (Gdk.EventExpose event)
+    public bool expose_event (Gdk.EventExpose event)
     {
-      this.propagate_expose (this.get_child (), event);
+      // FIXME: this.propagate_expose (this.get_child (), event);
       return true;
     }
   }
@@ -645,7 +648,7 @@ namespace Synapse.Gui
       current_size = IconSize.DIALOG;
     }
     
-    public override void size_request (out Requisition req)
+    public void size_request (out Requisition req)
     {
       req = {
         this.width_request,
@@ -663,20 +666,23 @@ namespace Synapse.Gui
       }
     }
 
-    public override bool expose_event (Gdk.EventExpose event)
+    public bool expose_event (Gdk.EventExpose event)
     {
       if (current == null || current == "") return true;
-      var ctx = Gdk.cairo_create (this.window);
+      var ctx = Gdk.cairo_create (this.get_window ());
       ctx.set_operator (Cairo.Operator.OVER);
 
-      int w = this.allocation.width - this.xpad * 2;
-      int h = this.allocation.height - this.ypad * 2;
-      ctx.translate (this.allocation.x + this.xpad, this.allocation.y + this.ypad);
+	  Gtk.Allocation allocation;
+	  this.get_allocation (out allocation);
+
+      int w = allocation.width - this.xpad * 2;
+      int h = allocation.height - this.ypad * 2;
+      ctx.translate (allocation.x + this.xpad, allocation.y + this.ypad);
       ctx.rectangle (0, 0, w, h);
       ctx.clip ();
 
       Gdk.Pixbuf icon_pixbuf = IconCacheService.get_default ().get_icon (
-            current, pixel_size <= 0 ? int.min (this.allocation.width, this.allocation.height) : pixel_size);
+            current, pixel_size <= 0 ? int.min (allocation.width, allocation.height) : pixel_size);
 
       if (icon_pixbuf == null) return true;
 
@@ -746,19 +752,22 @@ namespace Synapse.Gui
       this.notify["focus-height"].connect (this.queue_draw);
     }
 
-    public override bool expose_event (Gdk.EventExpose event)
+    public bool expose_event (Gdk.EventExpose event)
     {
       if (draw_input)
       {
-        var ctx = Gdk.cairo_create (this.window);
+		Gtk.Allocation allocation;
+		this.get_allocation (out allocation);
+		
+        var ctx = Gdk.cairo_create (this.get_window ());
         ctx.translate (1.5, 1.5);
         ctx.set_operator (Cairo.Operator.OVER);
         ctx.set_line_width (1.25);
 
-        double x = this.allocation.x + this.left_padding,
-               y = this.allocation.y + this.top_padding,
-               w = this.allocation.width - this.left_padding - this.right_padding - 3.0,
-               h = this.allocation.height - this.top_padding - this.bottom_padding - 3.0;
+        double x = allocation.x      + this.left_padding,
+               y = allocation.y      + this.top_padding,
+               w = allocation.width  - this.left_padding - this.right_padding - 3.0,
+               h = allocation.height - this.top_padding  - this.bottom_padding - 3.0;
         Utils.cairo_rounded_rect (ctx, x, y, w, h, border_radius);
         if (!ch.is_dark_color (ch.StyleType.FG, StateType.NORMAL))
           ch.set_source_rgba (ctx, input_alpha, ch.StyleType.BG, StateType.NORMAL, ch.Mod.DARKER);
@@ -783,9 +792,10 @@ namespace Synapse.Gui
             .-'                '-.
            x1         x2         x3  y2
           */
-          double x1 = double.max (_focus_widget.allocation.x, x),
-                 x3 = double.min (_focus_widget.allocation.x + _focus_widget.allocation.width,
-                           x + w);
+		  Gtk.Allocation focus_widget_allocation;
+		  _focus_widget.get_allocation (out focus_widget_allocation);
+          double x1 = double.max (focus_widget_allocation.x, x),
+                 x3 = double.min (focus_widget_allocation.x + focus_widget_allocation.width, x + w);
           double x2 = (x1 + x3) / 2.0;
           double y2 = y + h;
           double y1 = y + h - focus_height;
@@ -822,7 +832,8 @@ namespace Synapse.Gui
         ch.set_source_rgba (ctx, 0.6 * input_alpha, ch.StyleType.FG, StateType.NORMAL);
         ctx.stroke ();
       }
-      return base.expose_event (event);
+      // FIXME: return base.expose_event (event);
+	  return true;
     }
   }
   
@@ -841,12 +852,12 @@ namespace Synapse.Gui
       
       this.add (throbber);
     }
-    public override void size_request (out Requisition requisition)
+    public void size_request (out Requisition requisition)
     {
       requisition.width = 11;
       requisition.height = 11;
     }
-    public override void size_allocate (Gdk.Rectangle allocation)
+    public override void size_allocate (Gtk.Allocation allocation)
     {
       Allocation alloc = {allocation.x, allocation.y, allocation.width, allocation.height};
       set_allocation (alloc);
@@ -856,14 +867,14 @@ namespace Synapse.Gui
       throbber.size_allocate (allocation);
     }
     
-    public override bool expose_event (Gdk.EventExpose event)
+    public bool expose_event (Gdk.EventExpose event)
     {
       if (this.active)
       {
         /* Propagate Expose */               
         Bin c = (this is Bin) ? (Bin) this : null;
-        if (c != null)
-          c.propagate_expose (this.get_child(), event);
+        // FIXME: if (c != null)
+        //   c.propagate_expose (this.get_child(), event);
       }
       else
       {
@@ -962,33 +973,38 @@ namespace Synapse.Gui
       menu.popup (null, null, null, 1, 0);
     }
     public signal void settings_clicked ();
-    public override void size_allocate (Gdk.Rectangle allocation)
+
+    public void size_allocate (Gtk.Allocation allocation)
     {
       Allocation alloc = {allocation.x, allocation.y, allocation.width, allocation.height};
       set_allocation (alloc);
     }
-    public override void size_request (out Requisition requisition)
+
+    public void size_request (out Requisition requisition)
     {
       requisition.width = 11;
       requisition.height = 11;
     }
     
-    public override bool expose_event (Gdk.EventExpose event)
+    public bool expose_event (Gdk.EventExpose event)
     {
-      var ctx = Gdk.cairo_create (this.window);
+      var ctx = Gdk.cairo_create (this.get_window ());
       double SIZE = 0.5;
       ctx.translate (SIZE, SIZE);
       ctx.set_operator (Cairo.Operator.OVER);
-      
+	  
+      Gtk.Allocation allocation;
+	  this.get_allocation (out allocation);
+	  
       double r = 0.0, g = 0.0, b = 0.0;
-      double size = button_scale * int.min (this.allocation.width, this.allocation.height) - SIZE * 2;
+      double size = button_scale * int.min (allocation.width, allocation.height) - SIZE * 2;
 
       
       Pattern pat;
-      pat = new Pattern.linear (this.allocation.x,
-                                this.allocation.y,
-                                this.allocation.x,
-                                this.allocation.y + this.allocation.height);
+      pat = new Pattern.linear (allocation.x,
+                                allocation.y,
+                                allocation.x,
+                                allocation.y + allocation.height);
       if (entered || this.get_state () == StateType.SELECTED)
       {
         ch.get_rgb (out r, out g, out b, ch.StyleType.BG, StateType.SELECTED);
@@ -1012,8 +1028,8 @@ namespace Synapse.Gui
       
       size *= 0.5;
       ctx.set_source (pat);
-      ctx.arc (this.allocation.x + this.allocation.width - SIZE * 2 - size,
-               this.allocation.y + size,
+      ctx.arc (allocation.x + allocation.width - SIZE * 2 - size,
+               allocation.y + size,
                size, 0, Math.PI * 2);
       ctx.fill ();
 
@@ -1027,8 +1043,8 @@ namespace Synapse.Gui
       }
       
       ctx.set_source_rgb (r, g, b);
-      ctx.arc (this.allocation.x + this.allocation.width - SIZE * 2 - size,
-               this.allocation.y + size,
+      ctx.arc (allocation.x + allocation.width - SIZE * 2 - size,
+               allocation.y + size,
                size * 0.5, 0, Math.PI * 2);
       ctx.fill ();
       
@@ -1218,19 +1234,23 @@ namespace Synapse.Gui
         hmax = int.max (hmax, txt.height);
       }
     }
-    protected override void size_request (out Gtk.Requisition req)
+
+    protected void size_request (out Gtk.Requisition req)
     {
       req.width = wmax * 3; // triple for fading
       req.height = hmax;
     }
+
     public void select_prev ()
     {
       selected = selected - 1;
     }
+
     public void select_next ()
     {
       selected = selected + 1;
     }
+
     private void update_cached_surface ()
     {
       if (!this.get_realized ()) return;
@@ -1239,7 +1259,7 @@ namespace Synapse.Gui
       txt = texts.last ();
       w = txt.offset + txt.width;
       h = hmax * 3; //triple h for nice vertical placement
-      var window_context = Gdk.cairo_create (this.window);
+      var window_context = Gdk.cairo_create (this.get_window ());
       this.cached_surface = new Surface.similar (window_context.get_target (), Cairo.Content.COLOR_ALPHA, w, h);
       var ctx = new Cairo.Context (this.cached_surface);
 
@@ -1296,7 +1316,11 @@ namespace Synapse.Gui
     {
       double draw_offset = 0; //target offset
       PangoReadyText txt = texts.get (_selected);
-      draw_offset = this.allocation.width / 2 - txt.offset - txt.width / 2;
+	  
+	  Gtk.Allocation allocation;
+	  this.get_allocation (out allocation);
+	  
+      draw_offset = allocation.width / 2 - txt.offset - txt.width / 2;
       int target = (int)Math.round (draw_offset);
       if (!animation_enabled)
       {
@@ -1314,14 +1338,19 @@ namespace Synapse.Gui
       queue_draw ();
       return true;
     }
-    protected override bool expose_event (Gdk.EventExpose event)
+    protected bool expose_event (Gdk.EventExpose event)
     {
       if (texts.size == 0 || this.cached_surface == null)
         return true;
-      var ctx = Gdk.cairo_create (this.window);
-      ctx.translate (this.allocation.x, this.allocation.y);
-      double w = this.allocation.width;
-      double h = this.allocation.height;
+      var ctx = Gdk.cairo_create (this.get_window ());
+	  
+	  Gtk.Allocation allocation;
+	  this.get_allocation (out allocation);
+	  
+      ctx.translate (allocation.x, allocation.y);
+	  
+      double w = allocation.width;
+      double h = allocation.height;
       
       ctx.set_operator (Cairo.Operator.OVER);
       double x, y;

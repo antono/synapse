@@ -24,7 +24,7 @@ namespace Synapse.Gui
 {
   namespace Utils
   {
-    private static Gdk.Pixmap transparent_pixmap = null;
+    // private static Gdk.Pixmap transparent_pixmap = null;
     private static string home_directory = null;
     private static long home_directory_length = 0;
     
@@ -184,17 +184,17 @@ namespace Synapse.Gui
       unowned Gdk.Window window = widget.get_window ();
       if (window == null) return;
       
-      if (widget.is_composited ())
-      {
-        if (transparent_pixmap == null)
-        {
-          transparent_pixmap = new Gdk.Pixmap (window, 1, 1, -1);
-          var cr = Gdk.cairo_create (transparent_pixmap);
-          cr.set_operator (Cairo.Operator.CLEAR);
-          cr.paint ();
-        }
-        window.set_back_pixmap (transparent_pixmap, false);
-      }
+      // if (widget.is_composited ())
+      // {
+      //   if (transparent_pixmap == null)
+      //   {
+      //     transparent_pixmap = new Gdk.Pixmap (window, 1, 1, -1);
+      //     var cr = Gdk.cairo_create (transparent_pixmap);
+      //     cr.set_operator (Cairo.Operator.CLEAR);
+      //     cr.paint ();
+      //   }
+      //   window.set_back_pixmap (transparent_pixmap, false);
+      // }
     }
     
     private static void on_style_set (Gtk.Widget widget, Gtk.Style? prev_style)
@@ -232,7 +232,11 @@ namespace Synapse.Gui
       Gdk.Screen screen_for_pointer = null;
       display.get_pointer (out screen_for_pointer, out x, out y, null);
       
-      Gdk.Rectangle rect = {0, 0};
+	  // FIXME: https://bugzilla.gnome.org/show_bug.cgi?id=669580
+      // Gdk.Rectangle rect = { 0, 0 };
+	  var rect = Gdk.Rectangle ();
+	  rect.x = 0;
+	  rect.y = 0;
       screen_for_pointer.get_monitor_geometry (screen_for_pointer.get_monitor_at_point (x, y), out rect);
       
       return rect;
@@ -244,7 +248,7 @@ namespace Synapse.Gui
         return;
       var rect = get_current_monitor_geometry (screen);
       Gtk.Requisition req = {0, 0};
-      win.size_request (out req);
+      win.get_preferred_size (out req, out req);
       win.move (rect.x + (rect.width - req.width) / 2, rect.y + (rect.height - req.height) / 2);
     }
 
@@ -794,15 +798,18 @@ namespace Synapse.Gui
     
     public static bool is_point_in_mask (Gtk.Widget w, int x, int y)
     {
-      if (x < 0 || y < 0 || x >= w.allocation.width || y >= w.allocation.height) return false;
+	  Gtk.Allocation allocation;
+	  w.get_allocation (out allocation);
+	  
+      if (x < 0 || y < 0 || x >= allocation.width || y >= allocation.height) return false;
       if (!w.is_composited ()) return true;
       
       // create an image surface to hold the rendered window
-      Cairo.ImageSurface mask = new Cairo.ImageSurface (Cairo.Format.ARGB32, w.allocation.width, w.allocation.height);
+      Cairo.ImageSurface mask = new Cairo.ImageSurface (Cairo.Format.ARGB32, allocation.width, allocation.height);
       Cairo.Context cr = new Cairo.Context (mask);
       cr.set_operator (Cairo.Operator.SOURCE);
       // copy the window content into the mask
-      Cairo.Context ctx = Gdk.cairo_create (w.window);
+      Cairo.Context ctx = Gdk.cairo_create (w.get_window ());
       cr.set_source_surface (ctx.get_target (), 0 ,0);
       cr.paint ();
       // check if the point alpha is != 0
@@ -835,31 +842,31 @@ namespace Synapse.Gui
       if (Synapse.Utils.Logger.debug_enabled ()) return;
       uint32 time = Gtk.get_current_event_time();
 
-      Gdk.pointer_ungrab (time);
-      Gdk.keyboard_ungrab (time);
+      // Gdk.pointer_ungrab (time);
+      // Gdk.devise_ungrab (time);
       Gtk.grab_remove (window);
     }
     /* Code from Gnome-Do */
     private static bool try_grab_window (Gtk.Window window)
     {
       uint time = Gtk.get_current_event_time();
-      if (Gdk.pointer_grab (window.get_window(),
-            true,
-            Gdk.EventMask.BUTTON_PRESS_MASK |
-            Gdk.EventMask.BUTTON_RELEASE_MASK |
-            Gdk.EventMask.POINTER_MOTION_MASK,
-            null,
-            null,
-            time) == Gdk.GrabStatus.SUCCESS)
-      {
-        if (Gdk.keyboard_grab (window.get_window(), true, time) == Gdk.GrabStatus.SUCCESS) {
-          Gtk.grab_add (window);
-          return true;
-        } else {
-          Gdk.pointer_ungrab (time);
-          return false;
-        }
-      }
+      // if (Gdk.pointer_grab (window.get_window(),
+      //       true,
+      //       Gdk.EventMask.BUTTON_PRESS_MASK |
+      //       Gdk.EventMask.BUTTON_RELEASE_MASK |
+      //       Gdk.EventMask.POINTER_MOTION_MASK,
+      //       null,
+      //       null,
+      //       time) == Gdk.GrabStatus.SUCCESS)
+      // {
+      //   if (Gdk.keyboard_grab (window.get_window(), true, time) == Gdk.GrabStatus.SUCCESS) {
+      //     Gtk.grab_add (window);
+      //     return true;
+      //   } else {
+      //     Gdk.pointer_ungrab (time);
+      //     return false;
+      //   }
+      // }
       return false;
     }
 

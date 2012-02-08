@@ -257,9 +257,9 @@ namespace Synapse.Gui
       uint key = event.keyval;
       switch (key)
       {
-        case Gdk.KeySyms.Return:
-        case Gdk.KeySyms.KP_Enter:
-        case Gdk.KeySyms.ISO_Enter:
+        case Gdk.Key.Return:
+        case Gdk.Key.KP_Enter:
+        case Gdk.Key.ISO_Enter:
           debug ("enter pressed");
           if (current_match != null && current_action != null)
           {
@@ -268,11 +268,11 @@ namespace Synapse.Gui
             search_reset ();
           }
           break;
-        case Gdk.KeySyms.Delete:
-        case Gdk.KeySyms.BackSpace:
+        case Gdk.Key.Delete:
+        case Gdk.Key.BackSpace:
           search_delete_char ();
           break;
-        case Gdk.KeySyms.Escape:
+        case Gdk.Key.Escape:
           debug ("escape");
           if (search_string != "")
           {
@@ -298,28 +298,28 @@ namespace Synapse.Gui
       var window = new SynapseWindow ();
       window.show_all ();
 
-      var registry = GtkHotkey.Registry.get_default ();
-      GtkHotkey.Info hotkey;
-      try
-      {
-        if (registry.has_hotkey ("sezen2", "activate"))
-        {
-          hotkey = registry.get_hotkey ("sezen2", "activate");
-        }
-        else
-        {
-          hotkey = new GtkHotkey.Info ("sezen2", "activate",
-                                       "<Control>space", null);
-          registry.store_hotkey (hotkey);
-        }
-        debug ("Binding activation to %s", hotkey.signature);
-        hotkey.bind ();
-        hotkey.activated.connect (window.activate);
-      }
-      catch (Error err)
-      {
-        warning ("%s", err.message);
-      }
+      // var registry = GtkHotkey.Registry.get_default ();
+      // GtkHotkey.Info hotkey;
+      // try
+      // {
+      //   if (registry.has_hotkey ("sezen2", "activate"))
+      //   {
+      //     hotkey = registry.get_hotkey ("sezen2", "activate");
+      //   }
+      //   else
+      //   {
+      //     hotkey = new GtkHotkey.Info ("sezen2", "activate",
+      //                                  "<Control>space", null);
+      //     registry.store_hotkey (hotkey);
+      //   }
+      //   debug ("Binding activation to %s", hotkey.signature);
+      //   hotkey.bind ();
+      //   hotkey.activated.connect (window.activate);
+      // }
+      // catch (Error err)
+      // {
+      //   warning ("%s", err.message);
+      // }
 
       Gtk.main ();
       window.destroy ();

@@ -120,37 +120,53 @@ namespace UI.Widgets
     
     protected override void realize ()
     {
-      this.set_flags (WidgetFlags.NO_WINDOW);
+      // this.set_flags (WidgetFlags.NO_WINDOW);
       this.set_window (this.get_parent ().get_window ());
       base.realize ();
     }
 
-    protected override bool expose_event (Gdk.EventExpose event)
+    protected bool expose_event (Gdk.EventExpose event)
     {
       if (this.get_state () == StateType.SELECTED)
       {
-        bool had_focus = Gtk.WidgetFlags.HAS_FOCUS in this.get_flags ();
+        bool had_focus = Gtk.StateFlags.FOCUSED in this.get_state_flags ();
+		
         // fool theme engine to use proper bg color
-        if (!had_focus) this.set_flags (Gtk.WidgetFlags.HAS_FOCUS);
-        Gtk.paint_flat_box (this.style, event.window, this.get_state (),
-                            ShadowType.NONE, event.area, this, "cell_odd",
-                            this.allocation.x,
-                            this.allocation.y,
-                            this.allocation.width,
-                            this.allocation.height - (last ? 0 : 1));
-        if (!had_focus) this.unset_flags (Gtk.WidgetFlags.HAS_FOCUS);
+        if (!had_focus) this.set_state_flags (Gtk.StateFlags.FOCUSED, false);
+
+		Gtk.Allocation allocation;
+		this.get_allocation (out allocation);
+		
+        // FIXME: Gtk.paint_flat_box (this.style,
+		// 					Gdk.cairo_create (event.window),
+		// 					this.get_state (),
+        //                     ShadowType.NONE,
+		// 					event.area as Widget,
+		// 					"cell_odd",
+        //                     allocation.x,
+        //                     allocation.y,
+        //                     allocation.width,
+        //                     allocation.height - (last ? 0 : 1));
+		
+        if (!had_focus) this.unset_state_flags (Gtk.StateFlags.FOCUSED);
       }
 
       if (!last)
       {
-        Gtk.paint_hline (this.style, event.window, StateType.NORMAL,
-                         event.area, this, null,
-                         this.allocation.x,
-                         this.allocation.x + this.allocation.width,
-                         this.allocation.y + this.allocation.height - 1);
+		Gtk.Allocation allocation;
+		this.get_allocation (out allocation);
+		
+        // FIXME: Gtk.paint_hline (this.style,
+		// 				 Gdk.cairo_create (event.window),
+		// 				 StateType.NORMAL,
+        //                  event.area as Widget, null,
+        //                  allocation.x,
+        //                  allocation.x + allocation.width,
+        //                  allocation.y + allocation.height - 1);
       }
 
-      return base.expose_event (event);
+      // return base.expose_event (event);
+	  return true;
     }
 
     public void update_state ()
