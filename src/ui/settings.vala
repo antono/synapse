@@ -318,7 +318,7 @@ namespace Synapse.Gui
       behavior_vbox.pack_start (row, false);
       var select_theme_label = new Label (_("Theme:"));
       row.pack_start (select_theme_label, false, false);
-      // FIXME: row.pack_end (build_theme_combo (), false, false);
+	  row.pack_end (build_theme_combo (), false, false);
 
       /* Autostart checkbox */
       var autostart = new CheckButton.with_label (_("Startup on login"));
@@ -468,38 +468,36 @@ namespace Synapse.Gui
       if (emit) keybinding_changed (key);
     }
 
-    // private ComboBox build_theme_combo ()
-    // {
-    //   var cb_themes = new ComboBox.text ();
-    //   /* Set the model */                  /* key */      /* Label */
-    //   var theme_list = new ListStore (2, typeof(string), typeof(string));
-    //   cb_themes.clear ();
-    //   cb_themes.set_model (theme_list);
-    //   /* Set the renderer only for the Label */
-    //   var ctxt = new CellRendererText();
-    //   cb_themes.pack_start (ctxt, true);
-    //   cb_themes.set_attributes (ctxt, "text", 1);
-    //   /* Pack data into the model and select current theme */
-    //   if (!themes.has_key (selected_theme)) selected_theme = "default";
-    //   TreeIter iter;
-    //   foreach (Gee.Map.Entry<string,Theme?> e in themes.entries)
-    //   {
-    //     theme_list.append (out iter);
-    //     theme_list.set (iter, 0, e.key, 1, e.value.name);
-    //     if (e.key == selected_theme)
-    //       cb_themes.set_active_iter (iter);
-    //   }
-    //   /* Listen on value changed */
-    //   cb_themes.changed.connect (() => {
-    //     TreeIter active_iter;
-    //     cb_themes.get_active_iter (out active_iter);
-    //     theme_list.get (active_iter, 0, out selected_theme);
-    //     config.ui_type = selected_theme;
-    //     theme_selected (get_current_theme ());
-    //   });
+    private ComboBox build_theme_combo ()
+    {
+      /* Setup the model */                /* key */      /* Label */
+      var theme_list = new ListStore (2, typeof(string), typeof(string));
+	  var cb_themes = new ComboBox.with_model (theme_list);
+      /* Set the renderer only for the Label */
+      var ctxt = new CellRendererText();
+      cb_themes.pack_start (ctxt, true);
+      cb_themes.set_attributes (ctxt, "text", 1);
+      /* Pack data into the model and select current theme */
+      if (!themes.has_key (selected_theme)) selected_theme = "default";
+      TreeIter iter;
+      foreach (Gee.Map.Entry<string,Theme?> e in themes.entries)
+      {
+        theme_list.append (out iter);
+        theme_list.set (iter, 0, e.key, 1, e.value.name);
+        if (e.key == selected_theme)
+          cb_themes.set_active_iter (iter);
+      }
+      /* Listen on value changed */
+      cb_themes.changed.connect (() => {
+        TreeIter active_iter;
+        cb_themes.get_active_iter (out active_iter);
+        theme_list.get (active_iter, 0, out selected_theme);
+        config.ui_type = selected_theme;
+        theme_selected (get_current_theme ());
+      });
       
-    //   return cb_themes;
-    // }
+      return cb_themes;
+    }
 
     public Type get_current_theme ()
     {
